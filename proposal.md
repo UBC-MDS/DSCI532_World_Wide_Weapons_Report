@@ -5,6 +5,24 @@ One of the key topics in the October 2019 Canadian Federal Election was [gun con
 
 ### Description of the Data
 
+To populate our dashboard, we will be using the following two datasets:
+
+- [Worldwide Arms and Ammunition Trading](http://data.un.org/Data.aspx?d=ComTrade&f=_l1Code%3a93) dataset by [United Nations Statistics Department](https://unstats.un.org/home/), covering roughly last 30 years (1988 - 2018) of international import/export trading operations of different kinds of arms/ammunition and related goods (per country per year).
+Since we are only interested in total import/export by country by year, we will be summarizing all individual weapon kinds import/export USD values into a **Total Value** feature. After some wrangling, we get a tidy dataset with the following features:
+    - **Country** - observation country name
+    - **Year** - observation year (from 1988 to 2018)
+    - **Direction** - trade operation direction (import or export)   
+    - **Total Value** - total USD value for the given country on given year for given trade direction summarized across all kinds of weapons / arms / ammunitions
+       
+- [GDP by Country](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD) dataset by [The World Bank](https://www.worldbank.org/), providing inflation-adjusted Gross Domestic Product for most countries for the period of 1960-2018. The dataset comes untidy, and after some wrangling/melting we can extract the following useful features:
+    - **Country** - observation country name
+    - **Year** - observation year (from 1960 to 2018)
+    - **GDP** - country's GDP value for the observation year (current USD)
+
+To produce some of the visualizations, the datasets will be later inner-joined by the **Country / Year** features of each dataset. 
+
+NOTE: Original datasets are stored in the [data / dirty](data/dirty) folder. Use [scripts/clean-data.py](/scripts/clean-data.py) to transform and clean the data. 
+Once cleaned, the tidy datasets are stored in the [data / clean](data/clean) folder.
 
 ### Research Questions and Usage Scenarios
 
