@@ -72,8 +72,8 @@ alt.themes.enable('configure_default_alt_theme')
 
 # Load datasets
 world_map_skl = alt.topo_feature(data.world_110m.url, 'countries')
-gdps = pd.read_csv('https://raw.githubusercontent.com/UBC-MDS/DSCI532_World_Wide_Weapons_Report/master/data/clean/gdp_1960_2018_worldbank.csv')
-arms = pd.read_csv('https://raw.githubusercontent.com/UBC-MDS/DSCI532_World_Wide_Weapons_Report/master/data/clean/un-arms-and-ammunition_1988-2018.csv')
+gdps = pd.read_csv('../data/clean/gdp_1960_2018_worldbank.csv')
+arms = pd.read_csv('../data/clean/un-arms-and-ammunition_1988-2018.csv')
 alt_country_ids = pd.read_csv(
     'https://raw.githubusercontent.com/KoGor/Map-Icons-Generator/master/data/world-110m-country-names.tsv',
     delimiter="\t")
@@ -81,25 +81,43 @@ alt_country_ids = pd.read_csv(
 # additional wrangling
 gdp_ids = pd.merge(gdps, alt_country_ids, left_on='Country', right_on='name')[['Country', 'id', 'Year', 'GDP']].dropna()
 arms_cleaned = arms[['Country', 'Year', 'Direction', 'USD_Value']]
-arms_gdp = arms_cleaned.merge(gdp_ids, on=['Country', 'Year'])
+arms_gdp = arms_cleaned.merge(gdp_ids, on=['Country', 'Year'], how="left")
 arms_gdp['percent_GDP'] = arms_gdp['USD_Value'] / arms_gdp['GDP']
+
+###Samantha's Stuff:
+def gdp_perc_chart(year=2018, stat_type='Export'):
+    countries = ['USA', 'Italy', 'Spain', 'Germany', 'Czech Rep.', 'Brazil', 'Norway', 
+                 'Switzerland', 'Turkey', 'Canada', 'Japan', 'Croatia', 'United Kingdom', 'France']
+    
+    # Wrangling specific to this chart:
+    df_for_perc_of_gdp = arms_gdp[(arms_gdp['Country'].isin(countries)) & 
+                                  (arms_gdp['Year'] == year) & 
+                                  (arms_gdp['Direction'] == stat_type)].drop_duplicates('Country')
+
+    df_for_perc_of_gdp['percent_GDP'] = df_for_perc_of_gdp['percent_GDP'] * 100
+    
+    # Make the chart:
+    gdp_perc_chart = alt.Chart(df_for_perc_of_gdp).mark_bar().encode(
+        alt.X('Country:N', 
+              sort=alt.EncodingSortField(field='percent_GDP', 
+                                         order='descending'),
+              title='Country',
+              axis=alt.Axis(labelAngle=45)),
+        alt.Y('percent_GDP:Q',
+              title='Arms Trade as a Percentage of GDP',
+              scale=alt.Scale(domain=(0, 0.5))),
+        alt.Order(shorthand=['percent_GDP'], sort='descending'),
+        alt.Tooltip(['Country', 'percent_GDP'])
+    ).configure_bar(color='orange'
+    ).properties(width=880, 
+                 height=230)
+    
+    return gdp_perc_chart
+
 
 # Init app
 app = dash.Dash(__name__, assets_folder='assets')
 app.title = 'World Wide Arms and Ammunition Movement and GDP Effects'
-
-def update_country_chart(stat_type = 'Import', country = 'Germany'):
-    country_USD = alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_area().encode(
-        alt.X('Year:O', title = "Year"),
-        alt.Y('USD_Value:Q', title = "USD Value"),
-    ).properties(title=f'{country} Weapons {stat_type} value in USD', width=250, height=200)
-    
-    country_gdp = alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_bar().encode(
-        alt.X('Year:O', title = "Year"),
-        alt.Y('percent_GDP:Q', title = "% of GDP"),
-    ).properties(title=f'{country} Weapons {stat_type} share in GDP', width=250, height=200)
-    
-    return country_gdp | country_USD
 
 # Build app layout
 app.layout = html.Div([
@@ -110,10 +128,10 @@ app.layout = html.Div([
             html.P('Choose statistic:'),
             html.Div([
                 dcc.RadioItems(
-                    id='stat_type',
+                    id='stat-type',
                     options=[
-                        {'label': 'Import', 'value': 'Import'},
-                        {'label': 'Export', 'value': 'Export'},
+                        {'label': 'Import', 'value': 'import'},
+                        {'label': 'Export', 'value': 'export'},
                         {'label': 'Net', 'value': 'net'}
                     ],
                     value='import'
@@ -141,68 +159,35 @@ app.layout = html.Div([
         ], className='right-col')
     ], className='top-container'),
 
-    html.Div([
-        html.Div('Weapons as % of GDP')
-    ], className='mid-container'),
+    html.Div([html.Iframe(
+        sandbox='allow-scripts',
+        id='plot',
+        height='300',
+        width='990',
+        style={'border-width': '0'},
+
+        ################ The magic happens here
+        srcDoc = gdp_perc_chart().to_html()
+        ################ The magic happens here
+        
+    )], className='mid-container'),
 
     html.Div([
-        html.Div('Country charts'),
-            html.Iframe(
-            sandbox='allow-scripts',
-            id='plot',
-            height='500',
-            width='1200',
-            style={'border-width': '1px'},
-
-            ################ The magic happens here
-            srcDoc = update_country_chart().to_html()
-            ################ The magic happens here
-            ),
-        # dcc.Dropdown(
-        # id='dd-chart',
-        # options=[
-        #     {'label': 'Import', 'value': 'Import'},
-        #     {'label': 'Export', 'value': 'Export'},
-        # ],
-        # value='Import',
-        # style=dict(width='45%',
-        #         verticalAlign="middle")
-        # ),
-        dcc.Dropdown(
-        id='dd-chart-y',
-        options=[
-            {'label': 'Germany', 'value': 'Germany'},
-            {'label': 'Canada', 'value': 'Canada'},
-            {'label': 'China', 'value': 'China'},
-        # Missing option here
-        ],
-        value='Germany',
-        style=dict(width='45%',
-                verticalAlign="middle")
-        ),
+        html.Div([
+            html.Div("Weapons Import share in GDP placeholder")
+        ], className='left-col'),
+        html.Div([
+            html.Div("Weapons Import placeholder")
+        ], className='right-col'),
     ], className='bottom-container')
 ], className='main-container')
 
 @app.callback(
-    [dash.dependencies.Output('world-chart', 'children'),
-    dash.dependencies.Output('plot', 'srcDoc'),
-    dash.dependencies.Input('year-slider', 'value'),
-    dash.dependencies.Input('stat_type', 'value'),
-    dash.dependencies.Input('dd-chart-y', 'value')
-     # dash.dependencies.Input('dd-chart', 'value'),
+    dash.dependencies.Output('world-chart', 'children'),
+    [dash.dependencies.Input('year-slider', 'value'),
+     dash.dependencies.Input('stat-type', 'value'),
      # dash.dependencies.Input('country-name', 'value'),
-    ])
-
-def update_plot(stat_type_column_name,
-                country_column_name):
-    '''
-    Takes in an xaxis_column_name and calls make_plot to update our Altair figure
-    '''
-    updated_plot = update_country_chart(stat_type_column_name,
-                            country_column_name).to_html()
-    return updated_plot
-
-
+     ])
 def update_world_chart(year, stat_type):
     print(year, stat_type)
     chart = alt.Chart(world_map_skl).mark_geoshape().encode(
@@ -229,6 +214,13 @@ def update_world_chart(year, stat_type):
         srcDoc=chart.to_html()
     )
 
+
+# def update_gdp_perc_chart(year=2018, stat_type='Export'):
+#     '''
+#     Takes in an xaxis_column_name and calls make_plot to update our Altair figure
+#     '''
+#     updated_plot = gdp_perc_chart(year, stat_type).to_html()
+#     return updated_plot
 
 # server = app.server
 if __name__ == '__main__':
