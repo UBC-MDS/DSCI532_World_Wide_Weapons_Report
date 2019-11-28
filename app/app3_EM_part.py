@@ -92,14 +92,14 @@ def update_country_chart(stat_type = 'Import', country = 'Germany'):
     country_USD = alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_area().encode(
         alt.X('Year:O', title = "Year"),
         alt.Y('USD_Value:Q', title = "USD Value"),
-    ).properties(title=f'{country} Weapons {stat_type} value in USD', width=250, height=200)
+    ).properties(title=f'{country} Weapons {stat_type} value in USD', width=350, height=250)
     
     country_gdp = alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_bar().encode(
         alt.X('Year:O', title = "Year"),
         alt.Y('percent_GDP:Q', title = "% of GDP"),
-    ).properties(title=f'{country} Weapons {stat_type} share in GDP', width=250, height=200)
+    ).properties(title=f'{country} Weapons {stat_type} share in GDP', width=350, height=250)
     
-    return country_gdp | country_USD
+    return (country_gdp | country_USD).properties(background='white')
 
 # Build app layout
 app.layout = html.Div([
@@ -110,7 +110,7 @@ app.layout = html.Div([
             html.P('Choose statistic:'),
             html.Div([
                 dcc.RadioItems(
-                    id='stat_type',
+                    id='stat-type',
                     options=[
                         {'label': 'Import', 'value': 'Import'},
                         {'label': 'Export', 'value': 'Export'},
@@ -149,27 +149,17 @@ app.layout = html.Div([
         html.Div('Country charts'),
             html.Iframe(
             sandbox='allow-scripts',
-            id='plot',
-            height='500',
-            width='1200',
+            id='plot2',
+            height='370',
+            width='1000',
             style={'border-width': '1px'},
 
             ################ The magic happens here
             srcDoc = update_country_chart().to_html()
             ################ The magic happens here
             ),
-        # dcc.Dropdown(
-        # id='dd-chart',
-        # options=[
-        #     {'label': 'Import', 'value': 'Import'},
-        #     {'label': 'Export', 'value': 'Export'},
-        # ],
-        # value='Import',
-        # style=dict(width='45%',
-        #         verticalAlign="middle")
-        # ),
         dcc.Dropdown(
-        id='dd-chart-y',
+        id='country-name',
         options=[
             {'label': 'Germany', 'value': 'Germany'},
             {'label': 'Canada', 'value': 'Canada'},
@@ -184,14 +174,9 @@ app.layout = html.Div([
 ], className='main-container')
 
 @app.callback(
-    [dash.dependencies.Output('world-chart', 'children'),
-    dash.dependencies.Output('plot', 'srcDoc'),
-    [dash.dependencies.Input('year-slider', 'value'),
-     dash.dependencies.Input('stat_type', 'value'),
-     dash.dependencies.Input('dd-chart-y', 'value'),
-     # dash.dependencies.Input('dd-chart', 'value'),
-     # dash.dependencies.Input('country-name', 'value'),
-     ])
+    dash.dependencies.Output('plot2', 'srcDoc'),
+    [dash.dependencies.Input('stat-type', 'value'),
+     dash.dependencies.Input('country-name', 'value')])
 
 def update_plot(stat_type_column_name,
                 country_column_name):
@@ -202,6 +187,11 @@ def update_plot(stat_type_column_name,
                             country_column_name).to_html()
     return updated_plot
 
+@app.callback(dash.dependencies.Output('world-chart', 'children'),
+    [dash.dependencies.Input('year-slider', 'value'),
+     dash.dependencies.Input('stat-type', 'value'),
+     # dash.dependencies.Input('country-name', 'value'),
+     ])
 
 def update_world_chart(year, stat_type):
     print(year, stat_type)
