@@ -19,6 +19,7 @@ tidy_df['Flow'] = (tidy_df['Flow'].str.replace('Re-Export', 'Export').
 tidy_df = tidy_df.rename(columns = {"Trade (USD)": "USD_Value",
                                     "Country or Area": "Country",
                                     "Flow": "Direction"})
+tidy_df = tidy_df.groupby(['Country', 'Year', 'Direction']).agg({'USD_Value': sum}).reset_index()
 tidy_df.to_csv("../data/clean/un-arms-and-ammunition_1988-2018.csv")
 
 print("Success!")
