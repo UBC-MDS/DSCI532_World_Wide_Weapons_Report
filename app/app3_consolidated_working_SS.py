@@ -79,10 +79,19 @@ alt_country_ids = pd.read_csv(
     delimiter="\t")
 
 # additional wrangling
-gdp_ids = pd.merge(gdps, alt_country_ids, left_on='Country', right_on='name')[['Country', 'id', 'Year', 'GDP']].dropna()
+gdp_ids = pd.merge(gdps, alt_country_ids, left_on='Country', right_on='name')[['Country', 'id', 'Year', 'GDP']]
+replacements_country_names = {'Bosnia and Herzegovina':'Bosnia Herzegovina',
+        'Central African Republic':'Central African Rep.',
+        "Cote d'Ivoire":"Côte d'Ivoire",
+        'Czech Republic':'Czech Rep.',
+        'Dominican Republic':'Dominican Rep.',
+        'Solomon Islands':'Solomon Isds',
+        'United States':'USA'}
+gdp_ids = gdp_ids.replace(replacements_country_names)
 arms_cleaned = arms[['Country', 'Year', 'Direction', 'USD_Value']]
 arms_gdp = arms_cleaned.merge(gdp_ids, on=['Country', 'Year'])
 arms_gdp['percent_GDP'] = arms_gdp['USD_Value'] / arms_gdp['GDP']
+
 
 # Init app
 app = dash.Dash(__name__, assets_folder='assets')
