@@ -21,8 +21,8 @@ Since we are only interested in total import/export by country by year, we will 
 
 To produce some of the visualizations, the datasets will be later inner-joined by the **Country / Year** features of each dataset. 
 
-NOTE: Original datasets are stored in the [data / dirty](data/dirty) folder. Use [scripts/clean-data.py](/scripts/clean-data.py) to transform and clean the data. 
-Once cleaned, the tidy datasets are stored in the [data / clean](data/clean) folder.
+NOTE: Original datasets are stored in the [data/dirty](data/dirty) folder. Use [scripts/clean-data.py](/scripts/clean-data.py) to transform and clean the data. 
+Once cleaned, the tidy datasets are stored in the [data/clean](data/clean) folder.
 
 ### Research Questions and Usage Scenarios
 

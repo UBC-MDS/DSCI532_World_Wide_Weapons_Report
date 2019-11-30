@@ -12,7 +12,7 @@ Please see the [Proposal](proposal.md) to further understand the purpose, motiva
 ![](media/World_Weapons_App_Sketch-1.png)
 
 ## Repository Structure
-- [app](app) - the interactive Dashboard code (Python + Dash)
+- [build](build) - the interactive Dashboard code (Python + Dash)
 - [data](data) - datasets used for the report
     - [dirty](data/dirty) - unmodified original datasets
     - [clean](data/clean) - cleaned tidy datasets
