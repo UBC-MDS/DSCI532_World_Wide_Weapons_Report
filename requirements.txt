@@ -5,5 +5,9 @@ altair==3.2.0
 vega_datasets==0.7.0
 gunicorn==20.0.0
 grasia_dash_components==0.3.4
-dash_bootstrap_components==0.7.2
-dash_daq==0.3.1
+dash-bootstrap-components==0.7.2
+dash-core-components==1.5.1
+dash-daq==0.3.1
+dash-html-components==1.0.2
+dash-renderer==1.2.1
+dash-table==4.5.1
