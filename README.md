@@ -3,7 +3,7 @@
 ## About
 This repository was created as part of an assignment in [UBC's Master of Data Science](https://masterdatascience.ubc.ca/) program. The goal of the assignment is to create an interactive dashboard that effectively visualizes specified research questions.
 
-[The interactive dashboard can be found here](https://app.slack.com/client/T17KZ4CR4/GQSQS6V1U)
+[The interactive dashboard can be found here](https://world-wide-weapons-report.herokuapp.com/)
 
 ## Description 
 
