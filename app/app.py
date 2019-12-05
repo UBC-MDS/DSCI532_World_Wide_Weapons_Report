@@ -268,6 +268,28 @@ def update_world_chart(year, stat_type, include_usa, gdp_pct):
 #################################################
 
 def make_gdp_perc_chart(year=2018, stat_type='Export'):
+    """
+    Create a bar chart that shows Imports/Exports (Dynamic based on switch/callback) as a percentage of GDP
+        in the year selected (based on year slider), and show the highest 15.
+    
+    Parameters
+    -----------
+    year: integer [1988, 2018]
+        the year for which data is to be displayed - controlled by slider, default is 2018
+    
+    stat_type: string one of 'Import' or 'Export'
+        determines whether this graph will show imports or exports as a percentage of GDP, 
+        default is 'Export', and controlled by switch
+
+    Returns
+    -----------
+    gdp_perc_chart: chart
+        bar chart showing stat_type as a percentage of GDP for the specified year
+    
+    Example
+    -----------
+    >>> make_gdp_perc_chart(2017, 'Import')
+    """
     countries = ['USA', 'Italy', 'Spain', 'Germany', 'Czech Rep.', 'Brazil', 'Norway',
                  'Switzerland', 'Turkey', 'Canada', 'Japan', 'Croatia', 'United Kingdom', 'France']
 
