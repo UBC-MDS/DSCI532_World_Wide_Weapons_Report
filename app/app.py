@@ -107,8 +107,20 @@ app.layout = html.Div([
     html.H1("World Wide Arms and Ammunition Movement and GDP Effects"),
 
     html.Div([
+        html.P(
+        "This app is designed to explore how the movement of weapons globally has changed over the last 30 years, and how imports and exports of arms and ammunition relate to a countries GDP.",
+        style = {'textAlign': 'Center',
+                 'margin-top': '10px',
+                 'margin-bottom': '10px'
+                #'margin-right': '0px',
+                #'margin-left': '0px',
+                #'font-family': 'sans-serif',
+                #'font-size': '25px',
+                #'line-height': '20px'
+        }),
         html.Div([
             html.Div([
+                
                 html.P('Choose statistic:'),
                 html.Div([
                     dcc.RadioItems(
