@@ -107,8 +107,15 @@ app.layout = html.Div([
     html.H1("World Wide Arms and Ammunition Movement and GDP Effects"),
 
     html.Div([
+        html.P(
+        "This app is designed to explore how the movement of weapons globally has changed over the last 30 years, and how imports and exports of arms and ammunition relate to a country's GDP.",
+        style = {'textAlign': 'Center',
+                 'margin-top': '10px',
+                 'margin-bottom': '10px'
+        }),
         html.Div([
             html.Div([
+                
                 html.P('Choose statistic:'),
                 html.Div([
                     dcc.RadioItems(
@@ -129,8 +136,12 @@ app.layout = html.Div([
                     value='USA',
                     clearable=False
                 ),
-
-                html.P(''),
+                html.P("Explore changes through time of a single country using the lowermost visualizations.",
+                        style = {'textAlign': 'Left',
+                                 'margin-top': '2px',
+                                 'margin-bottom': '16px',
+                                 'font-size': '10px'
+                }),
                 daq.ToggleSwitch(
                     label='Include USA',
                     labelPosition='right',
@@ -139,8 +150,13 @@ app.layout = html.Div([
                     size=35,
                     id='include-usa'
                 ),
-
-                html.P(''),
+                html.P(
+                "Remove the outlier USA to better visualize differences between other nations.",
+                style = {'textAlign': 'Left',
+                         'margin-top': '2px',
+                         'margin-bottom': '16px',
+                         'font-size': '10px'
+                }),
                 daq.ToggleSwitch(
                     label='% of GDP',
                     labelPosition='right',
@@ -191,7 +207,11 @@ app.layout = html.Div([
                 width='1300',
                 style={'border-width': '0'},
             )
-        ], className='bottom-container')
+        ], className='bottom-container'),
+        "The data has been sourced from the United Nations Statistics Division and the World Bank.",
+        dcc.Markdown('''
+        Data sources: [GDP](http://data.un.org/Data.aspx?d=ComTrade&f=_l1Code%3a93), [Arms](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD)
+        '''),
     ], className='main-container')
 ])
 
@@ -323,6 +343,28 @@ def make_gdp_perc_chart(year=2018, stat_type='Export'):
 
 
 def update_country_chart(stat_type='Import', country='Germany'):
+    """
+    Creates two bar charts that show Imports/Exports (Dynamic based on switch/callback) as a percentage of GDP over time
+    and Imports/Exports (Dynamic based on switch/callback) value in USD over time. 
+    
+    Parameters
+    -----------
+    stat_type: string one of 'Import' or 'Export'
+        determines whether this graph will show imports or exports as a percentage of GDP, 
+        default is 'Export', and controlled by switch
+
+    Country: string 
+        the country for which data is to be displayed - controlled by drop down
+
+    Returns
+    -----------
+    update_country_chart: chart
+        two bar charts showing Imports/Exports as a percentage of GDP, and value USD over time
+    
+    Example
+    -----------
+    >>> make_gdp_perc_chart('Import', 'Germany')
+    """
     country_USD = alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_area().encode(
         alt.X('Year:O', title="Year"),
         alt.Y('USD_Value:Q', title="USD Value"),
@@ -333,7 +375,7 @@ def update_country_chart(stat_type='Import', country='Germany'):
         alt.Y('percent_GDP:Q', title="% of GDP"),
     ).properties(title=f'{country} Weapons {stat_type} share in GDP', width=375, height=250)
 
-    return (country_gdp | country_USD).properties(background='white')
+    return (country_gdp | country_USD).properties(background='white').configure_bar(color='orange').configure_area(color='orange')
 
 
 # Run the app

@@ -18,8 +18,8 @@ Please see the [Proposal](proposal.md) to further understand the purpose, motiva
 - [data](data) - datasets used for the report
     - [dirty](data/dirty) - unmodified original datasets
     - [clean](data/clean) - cleaned tidy datasets
-        - [gdp_1960_2018_worldbank.csv](data/clean/gdp_1960_2018_worldbank.csv) - cleaned [Worldwide Arms and Ammunition Trading](http://data.un.org/Data.aspx?d=ComTrade&f=_l1Code%3a93) dataset
-        - [un-arms-and-ammunition_1988-2018.csv](data/clean/un-arms-and-ammunition_1988-2018.csv) - cleaned [GDP by Country](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD) dataset
+        - [gdp_1960_2018_worldbank.csv](data/clean/gdp_1960_2018_worldbank.csv) - cleaned [GDP by Country](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD) dataset
+        - [un-arms-and-ammunition_1988-2018.csv](data/clean/un-arms-and-ammunition_1988-2018.csv) - cleaned [Worldwide Arms and Ammunition Trading](http://data.un.org/Data.aspx?d=ComTrade&f=_l1Code%3a93) dataset
 - [doc](doc) - additional documentation and records
 - [media](media) - images and other media resources used in the report and related documentation
 - [scripts](scripts) - a set of useful scripts for the report
