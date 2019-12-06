@@ -108,15 +108,10 @@ app.layout = html.Div([
 
     html.Div([
         html.P(
-        "This app is designed to explore how the movement of weapons globally has changed over the last 30 years, and how imports and exports of arms and ammunition relate to a countries GDP.",
+        "This app is designed to explore how the movement of weapons globally has changed over the last 30 years, and how imports and exports of arms and ammunition relate to a country's GDP.",
         style = {'textAlign': 'Center',
                  'margin-top': '10px',
                  'margin-bottom': '10px'
-                #'margin-right': '0px',
-                #'margin-left': '0px',
-                #'font-family': 'sans-serif',
-                #'font-size': '25px',
-                #'line-height': '20px'
         }),
         html.Div([
             html.Div([
@@ -141,8 +136,12 @@ app.layout = html.Div([
                     value='USA',
                     clearable=False
                 ),
-
-                html.P(''),
+                html.P("Explore changes through time of a single country using the lowermost visualizations.",
+                        style = {'textAlign': 'Left',
+                                 'margin-top': '2px',
+                                 'margin-bottom': '16px',
+                                 'font-size': '10px'
+                }),
                 daq.ToggleSwitch(
                     label='Include USA',
                     labelPosition='right',
@@ -151,8 +150,13 @@ app.layout = html.Div([
                     size=35,
                     id='include-usa'
                 ),
-
-                html.P(''),
+                html.P(
+                "Remove the outlier USA to better visualize differences between other nations.",
+                style = {'textAlign': 'Left',
+                         'margin-top': '2px',
+                         'margin-bottom': '16px',
+                         'font-size': '10px'
+                }),
                 daq.ToggleSwitch(
                     label='% of GDP',
                     labelPosition='right',
