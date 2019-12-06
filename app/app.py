@@ -207,7 +207,11 @@ app.layout = html.Div([
                 width='1300',
                 style={'border-width': '0'},
             )
-        ], className='bottom-container')
+        ], className='bottom-container'),
+        "The data has been sourced from the United Nations Statistics Division and the World Bank.",
+        dcc.Markdown('''
+        Data sources: [GDP](http://data.un.org/Data.aspx?d=ComTrade&f=_l1Code%3a93), [Arms](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD)
+        '''),
     ], className='main-container')
 ])
 
@@ -339,6 +343,28 @@ def make_gdp_perc_chart(year=2018, stat_type='Export'):
 
 
 def update_country_chart(stat_type='Import', country='Germany'):
+    """
+    Creates two bar charts that show Imports/Exports (Dynamic based on switch/callback) as a percentage of GDP over time
+    and Imports/Exports (Dynamic based on switch/callback) value in USD over time. 
+    
+    Parameters
+    -----------
+    stat_type: string one of 'Import' or 'Export'
+        determines whether this graph will show imports or exports as a percentage of GDP, 
+        default is 'Export', and controlled by switch
+
+    Country: string 
+        the country for which data is to be displayed - controlled by drop down
+
+    Returns
+    -----------
+    update_country_chart: chart
+        two bar charts showing Imports/Exports as a percentage of GDP, and value USD over time
+    
+    Example
+    -----------
+    >>> make_gdp_perc_chart('Import', 'Germany')
+    """
     country_USD = alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_area().encode(
         alt.X('Year:O', title="Year"),
         alt.Y('USD_Value:Q', title="USD Value"),
