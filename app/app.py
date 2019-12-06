@@ -375,7 +375,7 @@ def update_country_chart(stat_type='Import', country='Germany'):
         alt.Y('percent_GDP:Q', title="% of GDP"),
     ).properties(title=f'{country} Weapons {stat_type} share in GDP', width=375, height=250)
 
-    return (country_gdp | country_USD).properties(background='white')
+    return (country_gdp | country_USD).properties(background='white').configure_bar(color='orange').configure_area(color='orange')
 
 
 # Run the app
