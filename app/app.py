@@ -255,21 +255,25 @@ def update_plot3(year_val, stat_val):
               [dash.dependencies.Input('year-slider', 'value'),
                dash.dependencies.Input('stat-type', 'value'),
                dash.dependencies.Input('include-usa', 'value'),
-               dash.dependencies.Input('gdp-pct', 'value'),
-               # dash.dependencies.Input('country-name', 'value'),
-               ])
+               dash.dependencies.Input('gdp-pct', 'value')])
 def update_world_chart(year, stat_type, include_usa, gdp_pct):
-    arms_df_tmp = arms_gdp if include_usa else arms_gdp.query("Country != 'USA'")
-    # arms_df_tmp = pd.merge(arms_df_tmp, alt_country_ids, left_on='Country', right_on='name', how='right')
     map_stat = 'percent_GDP' if gdp_pct else 'USD_Value'
     map_legend = '% GDP' if gdp_pct else 'USD Value'
+    arms_df_tmp = arms_gdp.copy()
+    if not include_usa:
+        arms_df_tmp.loc[arms_df_tmp['Country'] == 'USA', map_stat] = 0
+
     print(year, stat_type, include_usa, gdp_pct)
-    chart = alt.Chart(world_map_skl).mark_geoshape().encode(
-        alt.Color(map_stat + ':Q', scale=alt.Scale(scheme='goldorange'), legend=alt.Legend(title=map_legend))
+    chart = alt.Chart(world_map_skl).mark_geoshape(stroke='white').encode(
+        color=alt.condition(alt.FieldEqualPredicate(field=map_stat, equal=0),
+                            alt.value('lightgray'), map_stat + ':Q',
+                            scale=alt.Scale(scheme='goldorange'),
+                            legend=alt.Legend(title=map_legend)),
+        tooltip=['Country:N', map_stat + ':Q']
     ).transform_lookup(
         lookup='id',
         from_=alt.LookupData(arms_df_tmp.query("Year == " + str(year)).query("Direction == '%s'" % (stat_type)), 'id',
-                             [map_stat])
+                             [map_stat, 'Country'])
     ).project('equirectangular').properties(
         width=720,
         height=300,
