@@ -81,8 +81,6 @@ alt_country_ids = pd.read_csv(
     delimiter="\t")
 
 # additional wrangling
-gdp_ids = pd.merge(gdps, alt_country_ids, left_on='Country', right_on='name', how='right')[
-    ['Country', 'id', 'Year', 'GDP']]
 replacements_country_names = {'Bosnia and Herzegovina': 'Bosnia Herzegovina',
                               'Central African Republic': 'Central African Rep.',
                               "Cote d'Ivoire": "Côte d'Ivoire",
@@ -90,11 +88,18 @@ replacements_country_names = {'Bosnia and Herzegovina': 'Bosnia Herzegovina',
                               'Dominican Republic': 'Dominican Rep.',
                               'Solomon Islands': 'Solomon Isds',
                               'United States': 'USA'}
-gdp_ids = gdp_ids.replace(replacements_country_names)
+alt_country_ids = alt_country_ids.replace(replacements_country_names)
+gdps = gdps.replace(replacements_country_names)
 arms_cleaned = arms[['Country', 'Year', 'Direction', 'USD_Value']]
-arms_gdp = arms_cleaned.merge(gdp_ids, on=['Country', 'Year'], how='right')
-# arms_gdp['USD_Value'] = 0
+arms_gdp = arms_cleaned.merge(gdps, on=['Country', 'Year'], how='right')
 arms_gdp['percent_GDP'] = 100 * arms_gdp['USD_Value'] / arms_gdp['GDP']
+arms_gdp = (alt_country_ids
+            .rename(columns={'name': 'Country'})
+            .assign(key=1)
+            .merge(pd.DataFrame(columns=['Year'], data=list(range(1990, 2019))).assign(key=1), on='key')
+            .merge(pd.DataFrame(columns=['Direction'], data=['Import', 'Export']).assign(key=1), on='key')
+            .drop('key', axis=1)
+            .merge(arms_gdp, on=['Country', 'Year', 'Direction', ], how='left')).fillna(0)
 
 # Init the app
 app = dash.Dash(__name__, assets_folder='assets', external_scripts=[
