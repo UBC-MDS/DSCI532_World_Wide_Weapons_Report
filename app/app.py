@@ -113,15 +113,13 @@ app.layout = html.Div([
 
     html.Div([
         html.P(
-        "This app is designed to explore how the movement of weapons globally has changed over the last 30 years, and how imports and exports of arms and ammunition relate to a country's GDP.",
-        style = {'textAlign': 'Center',
-                 'margin-top': '10px',
-                 'margin-bottom': '10px'
-        }),
+            "This app is designed to explore how the movement of weapons globally has changed over the last 30 years, and how imports and exports of arms and ammunition relate to a country's GDP.",
+            className='description'
+        ),
         html.Div([
             html.Div([
-                
-                html.P('Choose statistic:'),
+
+                html.P('Choose statistic:', className='block-caption'),
                 html.Div([
                     dcc.RadioItems(
                         id='stat-type',
@@ -133,7 +131,7 @@ app.layout = html.Div([
                     ),
                 ], className='button-switches'),
 
-                html.P('Choose country:'),
+                html.P('Choose country:', className='block-caption'),
                 dcc.Dropdown(
                     id='country-name',
                     options=list(
@@ -142,11 +140,8 @@ app.layout = html.Div([
                     clearable=False
                 ),
                 html.P("Explore changes through time of a single country using the lowermost visualizations.",
-                        style = {'textAlign': 'Left',
-                                 'margin-top': '2px',
-                                 'margin-bottom': '16px',
-                                 'font-size': '10px'
-                }),
+                       className='hint'
+                       ),
                 daq.ToggleSwitch(
                     label='Include USA',
                     labelPosition='right',
@@ -156,12 +151,9 @@ app.layout = html.Div([
                     id='include-usa'
                 ),
                 html.P(
-                "Remove the outlier USA to better visualize differences between other nations.",
-                style = {'textAlign': 'Left',
-                         'margin-top': '2px',
-                         'margin-bottom': '16px',
-                         'font-size': '10px'
-                }),
+                    "Remove the outlier USA to better visualize differences between other nations.",
+                    className="hint"
+                ),
                 daq.ToggleSwitch(
                     label='% of GDP',
                     labelPosition='right',
@@ -301,28 +293,28 @@ def update_world_chart(year, stat_type, include_usa, gdp_pct):
 #################################################
 
 def make_gdp_perc_chart(year=2018, stat_type='Export'):
-    """
+    '''
     Create a bar chart that shows Imports/Exports (Dynamic based on switch/callback) as a percentage of GDP
         in the year selected (based on year slider), and show the highest 15.
-    
+
     Parameters
     -----------
     year: integer [1988, 2018]
         the year for which data is to be displayed - controlled by slider, default is 2018
-    
+
     stat_type: string one of 'Import' or 'Export'
-        determines whether this graph will show imports or exports as a percentage of GDP, 
+        determines whether this graph will show imports or exports as a percentage of GDP,
         default is 'Export', and controlled by switch
 
     Returns
     -----------
     gdp_perc_chart: chart
         bar chart showing stat_type as a percentage of GDP for the specified year
-    
+
     Example
     -----------
-    >>> make_gdp_perc_chart(2017, 'Import')
-    """
+    > make_gdp_perc_chart(2017, 'Import')
+    '''
     countries = ['USA', 'Italy', 'Spain', 'Germany', 'Czech Rep.', 'Brazil', 'Norway',
                  'Switzerland', 'Turkey', 'Canada', 'Japan', 'Croatia', 'United Kingdom', 'France']
 
