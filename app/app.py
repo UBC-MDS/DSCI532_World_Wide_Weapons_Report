@@ -229,14 +229,17 @@ app.layout = html.Div([
 @app.callback(
     dash.dependencies.Output('plot2', 'srcDoc'),
     [dash.dependencies.Input('stat-type', 'value'),
-     dash.dependencies.Input('country-name', 'value')])
+     dash.dependencies.Input('country-name', 'value'),
+     dash.dependencies.Input('year-slider', 'value')])
 def update_plot(stat_type_column_name,
-                country_column_name):
+                country_column_name,
+                year):
     '''
     Takes in an xaxis_column_name and calls make_plot to update our Altair figure
     '''
     updated_plot = update_country_chart(stat_type_column_name,
-                                        country_column_name).to_html()
+                                        country_column_name,
+                                        year).to_html()
     return updated_plot
 
 
@@ -352,40 +355,45 @@ def make_gdp_perc_chart(year=2018, stat_type='Export'):
     return gdp_perc_chart
 
 
-def update_country_chart(stat_type='Import', country='Germany'):
-    """
+def update_country_chart(stat_type, country, year):
+    '''
     Creates two bar charts that show Imports/Exports (Dynamic based on switch/callback) as a percentage of GDP over time
-    and Imports/Exports (Dynamic based on switch/callback) value in USD over time. 
-    
+    and Imports/Exports (Dynamic based on switch/callback) value in USD over time.
+
     Parameters
     -----------
     stat_type: string one of 'Import' or 'Export'
-        determines whether this graph will show imports or exports as a percentage of GDP, 
+        determines whether this graph will show imports or exports as a percentage of GDP,
         default is 'Export', and controlled by switch
 
-    Country: string 
+    Country: string
         the country for which data is to be displayed - controlled by drop down
 
     Returns
     -----------
     update_country_chart: chart
         two bar charts showing Imports/Exports as a percentage of GDP, and value USD over time
-    
+
     Example
     -----------
-    >>> make_gdp_perc_chart('Import', 'Germany')
-    """
-    country_USD = alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_area().encode(
+    > make_gdp_perc_chart('Import', 'Germany')
+    '''
+    country_USD = (alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_area().encode(
         alt.X('Year:O', title="Year"),
         alt.Y('USD_Value:Q', title="USD Value"),
-    ).properties(title=f'{country} Weapons {stat_type} value in USD', width=375, height=250)
+    ) + alt.Chart(alt_country_ids.assign(intercept=year)).mark_rule(color='red').encode(
+        alt.X('intercept:O')
+    )).properties(title=f'{country} Weapons {stat_type} value in USD', width=375, height=250)
 
-    country_gdp = alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_bar().encode(
+    country_gdp = (alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_bar().encode(
         alt.X('Year:O', title="Year"),
         alt.Y('percent_GDP:Q', title="% of GDP"),
-    ).properties(title=f'{country} Weapons {stat_type} share in GDP', width=375, height=250)
+    ) + alt.Chart(alt_country_ids.assign(intercept=year)).mark_rule(color='red').encode(
+        alt.X('intercept:O')
+    )).properties(title=f'{country} Weapons {stat_type} share in GDP', width=375, height=250)
 
-    return (country_gdp | country_USD).properties(background='white').configure_bar(color='orange').configure_area(color='orange')
+    return (country_gdp | country_USD).properties(background='white').configure_bar(color='orange').configure_area(
+        color='orange')
 
 
 # Run the app
