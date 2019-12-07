@@ -14,7 +14,7 @@ from dash.dependencies import Input, Output
 # Configure global Altair theme
 def configure_default_alt_theme():
     font = "Open Sans, Arial"
-    axisColor = "#000000"
+    axisColor = "#555555"
     gridColor = "#DEDDDD"
     return {
         "config": {
@@ -22,7 +22,8 @@ def configure_default_alt_theme():
                 "fontSize": 20,
                 "font": font,
                 "anchor": "center",  # equivalent of left-aligned.
-                "fontColor": "#000000",
+                "fontWeight": "600",
+                "color": "#555555",
                 "dx": 50,
                 "dy": -10
             },
@@ -39,13 +40,19 @@ def configure_default_alt_theme():
                 "grid": False,
                 "labelFont": font,
                 "labelFontSize": 12,
+                "labelColor": "#555555",
                 "labelAngle": 45,
                 "tickColor": axisColor,
                 "tickSize": 5,  # default, including it just to show you can change it
                 "titleFont": font,
                 "titleFontSize": 16,
+                "titleColor": "#555555",
+                "titleFontWeight": "600",
                 "titlePadding": 10,  # guessing, not specified in styleguide
                 "title": "X Axis Title (units)",
+            },
+            "legend": {
+                "labelColor": "#555555"
             },
             "axisY": {
                 "domain": False,
@@ -53,10 +60,13 @@ def configure_default_alt_theme():
                 "gridColor": gridColor,
                 "gridWidth": 1,
                 "labelFont": font,
+                "labelColor": "#555555",
                 "labelFontSize": 14,
                 "labelAngle": 0,
                 "titleFont": font,
                 "titleFontSize": 16,
+                "titleColor": "#555555",
+                "titleFontWeight": "600",
                 "titlePadding": 10,  # guessing, not specified in styleguide
                 "title": "Y Axis Title (units)",
                 # titles are by default vertical left of axis so we need to hack this
