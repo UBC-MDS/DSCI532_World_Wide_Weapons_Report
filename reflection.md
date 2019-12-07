@@ -24,7 +24,7 @@ A summary of feedback is provided below:
 
 - Description of the app, toggles and data added to the app. 
 - Grey countries have been added so map is complete and missing data is indicated.
-- The colour of the plots has been updated to be constistent throughout the dashboard and a gradient of colour has been added to the *Trade as % of GDP* graph, corresponding to the global.
+- The colour of the plots has been updated to be consistent throughout the dashboard and a gradient of colour has been added to the *Trade as % of GDP* graph, corresponding to the global.
 - A slider line has been added to the lowermost visualizations of an individual country the corresponds to the year slider bar for the other graphs, so the year in reference is easier to visualize. 
 - Docstrings have been added to all functions
 - General code clean up and organization. 
@@ -37,11 +37,7 @@ A summary of feedback is provided below:
   - Not understanding the country drop down, since they had to scroll to see changes. 
   - Changing the map so countries without data were still visible in grey or some other colour.
   - Adding descriptions of the app and toggles. 
-A general theme for the feedback was adding breif annotations to the app to address any user confusion. 
+A general theme for the feedback was adding brief annotations to the app to address any user confusion. 
 
-Based on the feedback it was easy and appropriate to add descriptions of the app in general, toggles and the data. We also added the grey countries on the map, so a lack of data was interpretable. Some larger scale suggestions, such as adding tabs for the different visualizations, or changing the layout with all the toggles on one side bar were given. However, based on time we decided the addition of descriptions was an easy way to address the reasons these larger scale changes were suggested. 
-
-The most valuable part of the feedback process was observing the users work with our app. It was effective at allowing us to realize any large flaws with the structure, and letting us know which changes we needed to prioritize. 
-
-Overall the feedback led to improvements in the app and has allowed it to become more user friendly. 
+Based on the feedback it was easy and appropriate to add descriptions of the app in general, toggles and the data. We also added the grey countries on the map, so a lack of data was interpretable. Some larger scale suggestions, such as adding tabs for the different visualizations, or changing the layout with all the toggles on one side bar were given. However, based on time we decided the addition of descriptions was an easy way to address the reasons these larger scale changes were suggested. The most valuable part of the feedback process was observing the users work with our app. It allowed us to realize any large flaws with the structure, and which changes we needed to prioritize. Overall the feedback led to improvements in the app and has allowed it to become more user friendly. 
 
