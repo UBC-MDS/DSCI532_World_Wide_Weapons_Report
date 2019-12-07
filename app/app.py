@@ -216,7 +216,7 @@ app.layout = html.Div([
         ], className='bottom-container'),
         "The data has been sourced from the United Nations Statistics Division and the World Bank.",
         dcc.Markdown('''
-        Data sources: [GDP](http://data.un.org/Data.aspx?d=ComTrade&f=_l1Code%3a93), [Arms](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD)
+        Data sources: [GDP by Country](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD), [Worldwide Arms and Ammunition Trading](http://data.un.org/Data.aspx?d=ComTrade&f=_l1Code%3a93)
         '''),
     ], className='main-container')
 ])
