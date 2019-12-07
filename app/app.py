@@ -384,15 +384,15 @@ def update_country_chart(stat_type, country, year):
     country_USD = (alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_area().encode(
         alt.X('Year:O', title="Year"),
         alt.Y('USD_Value:Q', title="USD Value"),
-    ) + alt.Chart(alt_country_ids.assign(intercept=year)).mark_rule(color='red').encode(
-        alt.X('intercept:O')
+    ) + alt.Chart(alt_country_ids.assign(Selected_Year=year)).mark_rule(color='red').encode(
+        alt.X('Selected_Year:O')
     )).properties(title=f'{country} Weapons {stat_type} value in USD', width=375, height=250)
 
     country_gdp = (alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_bar().encode(
         alt.X('Year:O', title="Year"),
         alt.Y('percent_GDP:Q', title="% of GDP"),
-    ) + alt.Chart(alt_country_ids.assign(intercept=year)).mark_rule(color='red').encode(
-        alt.X('intercept:O')
+    ) + alt.Chart(alt_country_ids.assign(Selected_Year=year)).mark_rule(color='red').encode(
+        alt.X('Selected_Year:O')
     )).properties(title=f'{country} Weapons {stat_type} share in GDP', width=375, height=250)
 
     return (country_gdp | country_USD).properties(background='white').configure_bar(color='orange').configure_area(
