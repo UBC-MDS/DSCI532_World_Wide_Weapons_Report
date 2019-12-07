@@ -14,7 +14,7 @@ from dash.dependencies import Input, Output
 # Configure global Altair theme
 def configure_default_alt_theme():
     font = "Open Sans, Arial"
-    axisColor = "#000000"
+    axisColor = "#555555"
     gridColor = "#DEDDDD"
     return {
         "config": {
@@ -22,7 +22,8 @@ def configure_default_alt_theme():
                 "fontSize": 20,
                 "font": font,
                 "anchor": "center",  # equivalent of left-aligned.
-                "fontColor": "#000000",
+                "fontWeight": "600",
+                "color": "#555555",
                 "dx": 50,
                 "dy": -10
             },
@@ -39,13 +40,19 @@ def configure_default_alt_theme():
                 "grid": False,
                 "labelFont": font,
                 "labelFontSize": 12,
+                "labelColor": "#555555",
                 "labelAngle": 45,
                 "tickColor": axisColor,
                 "tickSize": 5,  # default, including it just to show you can change it
                 "titleFont": font,
                 "titleFontSize": 16,
+                "titleColor": "#555555",
+                "titleFontWeight": "600",
                 "titlePadding": 10,  # guessing, not specified in styleguide
                 "title": "X Axis Title (units)",
+            },
+            "legend": {
+                "labelColor": "#555555"
             },
             "axisY": {
                 "domain": False,
@@ -53,10 +60,13 @@ def configure_default_alt_theme():
                 "gridColor": gridColor,
                 "gridWidth": 1,
                 "labelFont": font,
+                "labelColor": "#555555",
                 "labelFontSize": 14,
                 "labelAngle": 0,
                 "titleFont": font,
                 "titleFontSize": 16,
+                "titleColor": "#555555",
+                "titleFontWeight": "600",
                 "titlePadding": 10,  # guessing, not specified in styleguide
                 "title": "Y Axis Title (units)",
                 # titles are by default vertical left of axis so we need to hack this
@@ -81,8 +91,6 @@ alt_country_ids = pd.read_csv(
     delimiter="\t")
 
 # additional wrangling
-gdp_ids = pd.merge(gdps, alt_country_ids, left_on='Country', right_on='name', how='right')[
-    ['Country', 'id', 'Year', 'GDP']]
 replacements_country_names = {'Bosnia and Herzegovina': 'Bosnia Herzegovina',
                               'Central African Republic': 'Central African Rep.',
                               "Cote d'Ivoire": "Côte d'Ivoire",
@@ -90,11 +98,18 @@ replacements_country_names = {'Bosnia and Herzegovina': 'Bosnia Herzegovina',
                               'Dominican Republic': 'Dominican Rep.',
                               'Solomon Islands': 'Solomon Isds',
                               'United States': 'USA'}
-gdp_ids = gdp_ids.replace(replacements_country_names)
+alt_country_ids = alt_country_ids.replace(replacements_country_names)
+gdps = gdps.replace(replacements_country_names)
 arms_cleaned = arms[['Country', 'Year', 'Direction', 'USD_Value']]
-arms_gdp = arms_cleaned.merge(gdp_ids, on=['Country', 'Year'], how='right')
-# arms_gdp['USD_Value'] = 0
+arms_gdp = arms_cleaned.merge(gdps, on=['Country', 'Year'], how='right')
 arms_gdp['percent_GDP'] = 100 * arms_gdp['USD_Value'] / arms_gdp['GDP']
+arms_gdp = (alt_country_ids
+            .rename(columns={'name': 'Country'})
+            .assign(key=1)
+            .merge(pd.DataFrame(columns=['Year'], data=list(range(1990, 2019))).assign(key=1), on='key')
+            .merge(pd.DataFrame(columns=['Direction'], data=['Import', 'Export']).assign(key=1), on='key')
+            .drop('key', axis=1)
+            .merge(arms_gdp, on=['Country', 'Year', 'Direction', ], how='left')).fillna(0)
 
 # Init the app
 app = dash.Dash(__name__, assets_folder='assets', external_scripts=[
@@ -108,15 +123,13 @@ app.layout = html.Div([
 
     html.Div([
         html.P(
-        "This app is designed to explore how the movement of weapons globally has changed over the last 30 years, and how imports and exports of arms and ammunition relate to a country's GDP.",
-        style = {'textAlign': 'Center',
-                 'margin-top': '10px',
-                 'margin-bottom': '10px'
-        }),
+            "This app is designed to explore how the movement of weapons globally has changed over the last 30 years, and how imports and exports of arms and ammunition relate to a country's GDP.",
+            className='description'
+        ),
         html.Div([
             html.Div([
-                
-                html.P('Choose statistic:'),
+
+                html.P('Choose statistic:', className='block-caption'),
                 html.Div([
                     dcc.RadioItems(
                         id='stat-type',
@@ -128,7 +141,7 @@ app.layout = html.Div([
                     ),
                 ], className='button-switches'),
 
-                html.P('Choose country:'),
+                html.P('Choose country:', className='block-caption'),
                 dcc.Dropdown(
                     id='country-name',
                     options=list(
@@ -137,11 +150,8 @@ app.layout = html.Div([
                     clearable=False
                 ),
                 html.P("Explore changes through time of a single country using the lowermost visualizations.",
-                        style = {'textAlign': 'Left',
-                                 'margin-top': '2px',
-                                 'margin-bottom': '16px',
-                                 'font-size': '10px'
-                }),
+                       className='hint'
+                       ),
                 daq.ToggleSwitch(
                     label='Include USA',
                     labelPosition='right',
@@ -151,12 +161,9 @@ app.layout = html.Div([
                     id='include-usa'
                 ),
                 html.P(
-                "Remove the outlier USA to better visualize differences between other nations.",
-                style = {'textAlign': 'Left',
-                         'margin-top': '2px',
-                         'margin-bottom': '16px',
-                         'font-size': '10px'
-                }),
+                    "Remove the outlier USA to better visualize differences between other nations.",
+                    className="hint"
+                ),
                 daq.ToggleSwitch(
                     label='% of GDP',
                     labelPosition='right',
@@ -175,6 +182,7 @@ app.layout = html.Div([
                     step=1,
                     value=2018,
                     updatemode='drag',
+                    included=False,
                     # FIXME: Have no idea why Dash complains
                     # FIXME: at np.arange(1980, 2018, 5)
                     # FIXME: Have to do this nasty workaround...
@@ -210,7 +218,7 @@ app.layout = html.Div([
         ], className='bottom-container'),
         "The data has been sourced from the United Nations Statistics Division and the World Bank.",
         dcc.Markdown('''
-        Data sources: [GDP](http://data.un.org/Data.aspx?d=ComTrade&f=_l1Code%3a93), [Arms](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD)
+        Data sources: [GDP by Country](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD), [Worldwide Arms and Ammunition Trading](http://data.un.org/Data.aspx?d=ComTrade&f=_l1Code%3a93)
         '''),
     ], className='main-container')
 ])
@@ -223,14 +231,17 @@ app.layout = html.Div([
 @app.callback(
     dash.dependencies.Output('plot2', 'srcDoc'),
     [dash.dependencies.Input('stat-type', 'value'),
-     dash.dependencies.Input('country-name', 'value')])
+     dash.dependencies.Input('country-name', 'value'),
+     dash.dependencies.Input('year-slider', 'value')])
 def update_plot(stat_type_column_name,
-                country_column_name):
+                country_column_name,
+                year):
     '''
     Takes in an xaxis_column_name and calls make_plot to update our Altair figure
     '''
     updated_plot = update_country_chart(stat_type_column_name,
-                                        country_column_name).to_html()
+                                        country_column_name,
+                                        year).to_html()
     return updated_plot
 
 
@@ -250,21 +261,25 @@ def update_plot3(year_val, stat_val):
               [dash.dependencies.Input('year-slider', 'value'),
                dash.dependencies.Input('stat-type', 'value'),
                dash.dependencies.Input('include-usa', 'value'),
-               dash.dependencies.Input('gdp-pct', 'value'),
-               # dash.dependencies.Input('country-name', 'value'),
-               ])
+               dash.dependencies.Input('gdp-pct', 'value')])
 def update_world_chart(year, stat_type, include_usa, gdp_pct):
-    arms_df_tmp = arms_gdp if include_usa else arms_gdp.query("Country != 'USA'")
-    # arms_df_tmp = pd.merge(arms_df_tmp, alt_country_ids, left_on='Country', right_on='name', how='right')
     map_stat = 'percent_GDP' if gdp_pct else 'USD_Value'
     map_legend = '% GDP' if gdp_pct else 'USD Value'
+    arms_df_tmp = arms_gdp.copy()
+    if not include_usa:
+        arms_df_tmp.loc[arms_df_tmp['Country'] == 'USA', map_stat] = 0
+
     print(year, stat_type, include_usa, gdp_pct)
-    chart = alt.Chart(world_map_skl).mark_geoshape().encode(
-        alt.Color(map_stat + ':Q', scale=alt.Scale(scheme='goldorange'), legend=alt.Legend(title=map_legend))
+    chart = alt.Chart(world_map_skl).mark_geoshape(stroke='white').encode(
+        color=alt.condition(alt.FieldEqualPredicate(field=map_stat, equal=0),
+                            alt.value('lightgray'), map_stat + ':Q',
+                            scale=alt.Scale(scheme='goldorange'),
+                            legend=alt.Legend(title=map_legend)),
+        tooltip=['Country:N', map_stat + ':Q']
     ).transform_lookup(
         lookup='id',
         from_=alt.LookupData(arms_df_tmp.query("Year == " + str(year)).query("Direction == '%s'" % (stat_type)), 'id',
-                             [map_stat])
+                             [map_stat, 'Country'])
     ).project('equirectangular').properties(
         width=720,
         height=300,
@@ -288,28 +303,28 @@ def update_world_chart(year, stat_type, include_usa, gdp_pct):
 #################################################
 
 def make_gdp_perc_chart(year=2018, stat_type='Export'):
-    """
+    '''
     Create a bar chart that shows Imports/Exports (Dynamic based on switch/callback) as a percentage of GDP
         in the year selected (based on year slider), and show the highest 15.
-    
+
     Parameters
     -----------
     year: integer [1988, 2018]
         the year for which data is to be displayed - controlled by slider, default is 2018
-    
+
     stat_type: string one of 'Import' or 'Export'
-        determines whether this graph will show imports or exports as a percentage of GDP, 
+        determines whether this graph will show imports or exports as a percentage of GDP,
         default is 'Export', and controlled by switch
 
     Returns
     -----------
     gdp_perc_chart: chart
         bar chart showing stat_type as a percentage of GDP for the specified year
-    
+
     Example
     -----------
-    >>> make_gdp_perc_chart(2017, 'Import')
-    """
+    > make_gdp_perc_chart(2017, 'Import')
+    '''
     countries = ['USA', 'Italy', 'Spain', 'Germany', 'Czech Rep.', 'Brazil', 'Norway',
                  'Switzerland', 'Turkey', 'Canada', 'Japan', 'Croatia', 'United Kingdom', 'France']
 
@@ -331,6 +346,7 @@ def make_gdp_perc_chart(year=2018, stat_type='Export'):
               title='Arms Trade as a % of GDP',
               # scale=alt.Scale(domain=(0, (0.2 if stat_type == 'Import' else 0.5)))
               ),
+        alt.Color('percent_GDP:Q', scale=alt.Scale(scheme='goldorange'), legend=None),
         alt.Order(shorthand=['percent_GDP'], sort='descending'),
         alt.Tooltip(['Country', 'percent_GDP'])
     ).configure_bar(color='orange'
@@ -342,40 +358,45 @@ def make_gdp_perc_chart(year=2018, stat_type='Export'):
     return gdp_perc_chart
 
 
-def update_country_chart(stat_type='Import', country='Germany'):
-    """
+def update_country_chart(stat_type, country, year):
+    '''
     Creates two bar charts that show Imports/Exports (Dynamic based on switch/callback) as a percentage of GDP over time
-    and Imports/Exports (Dynamic based on switch/callback) value in USD over time. 
-    
+    and Imports/Exports (Dynamic based on switch/callback) value in USD over time.
+
     Parameters
     -----------
     stat_type: string one of 'Import' or 'Export'
-        determines whether this graph will show imports or exports as a percentage of GDP, 
+        determines whether this graph will show imports or exports as a percentage of GDP,
         default is 'Export', and controlled by switch
 
-    Country: string 
+    Country: string
         the country for which data is to be displayed - controlled by drop down
 
     Returns
     -----------
     update_country_chart: chart
         two bar charts showing Imports/Exports as a percentage of GDP, and value USD over time
-    
+
     Example
     -----------
-    >>> make_gdp_perc_chart('Import', 'Germany')
-    """
-    country_USD = alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_area().encode(
+    > make_gdp_perc_chart('Import', 'Germany')
+    '''
+    country_USD = (alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_area().encode(
         alt.X('Year:O', title="Year"),
         alt.Y('USD_Value:Q', title="USD Value"),
-    ).properties(title=f'{country} Weapons {stat_type} value in USD', width=375, height=250)
+    ) + alt.Chart(alt_country_ids.assign(Selected_Year=year)).mark_rule(color='red').encode(
+        alt.X('Selected_Year:O')
+    )).properties(title=f'{country} Weapons {stat_type} value in USD', width=375, height=250)
 
-    country_gdp = alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_bar().encode(
+    country_gdp = (alt.Chart(arms_gdp.query(f'Direction == "{stat_type}" & Country == "{country}"')).mark_bar().encode(
         alt.X('Year:O', title="Year"),
         alt.Y('percent_GDP:Q', title="% of GDP"),
-    ).properties(title=f'{country} Weapons {stat_type} share in GDP', width=375, height=250)
+    ) + alt.Chart(alt_country_ids.assign(Selected_Year=year)).mark_rule(color='red').encode(
+        alt.X('Selected_Year:O')
+    )).properties(title=f'{country} Weapons {stat_type} share in GDP', width=375, height=250)
 
-    return (country_gdp | country_USD).properties(background='white').configure_bar(color='orange').configure_area(color='orange')
+    return (country_gdp | country_USD).properties(background='white').configure_bar(color='orange').configure_area(
+        color='orange')
 
 
 # Run the app
