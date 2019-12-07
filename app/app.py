@@ -180,6 +180,7 @@ app.layout = html.Div([
                     step=1,
                     value=2018,
                     updatemode='drag',
+                    included=False,
                     # FIXME: Have no idea why Dash complains
                     # FIXME: at np.arange(1980, 2018, 5)
                     # FIXME: Have to do this nasty workaround...
