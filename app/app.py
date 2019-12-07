@@ -344,6 +344,7 @@ def make_gdp_perc_chart(year=2018, stat_type='Export'):
               title='Arms Trade as a % of GDP',
               # scale=alt.Scale(domain=(0, (0.2 if stat_type == 'Import' else 0.5)))
               ),
+        alt.Color('percent_GDP:Q', scale=alt.Scale(scheme='goldorange'), legend=None),
         alt.Order(shorthand=['percent_GDP'], sort='descending'),
         alt.Tooltip(['Country', 'percent_GDP'])
     ).configure_bar(color='orange'
